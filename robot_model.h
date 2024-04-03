@@ -29,8 +29,8 @@ void ikine(Pose_End* pose_end, Robot_Model *robot_model, Robot_Rotation_Length* 
    robot_model->q1=pose_end->d_lateral;
    robot_model->q2=pose_end->pz;
    // 此处末端可视为二连杆机器人，逆运动学求解只考虑第二关节角度大于0的情况
-   double q0=atan2((pose_end->py-length->l1)/pose_end->px);
-   double a0=sqrt((pose_end->py-length->l1)*(pose_end->py-length->l1)+(pose_end->px)*(pose_end->px));
+   double q0=atan2(pose_end->py-length->l1,pose_end->px);
+   double a0=sqrt((pose_end->py-length->l1)*(pose_end->py - length->l1) + (pose_end->px)*(pose_end->px));
    double temp=(a0*a0+(length->l2)*(length->l2)-(length->l3)*(length->l3))/(2*a0*length->l2);
    robot_model->q3=-acos(temp)+q0;
    temp=(a0*a0-(length->l2)*(length->l2)+(length->l3)*(length->l3))/(2*a0*length->l3);
