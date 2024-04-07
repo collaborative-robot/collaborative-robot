@@ -24,6 +24,13 @@ typedef struct {
    double theta; // 末端旋转角度，°
 } Pose_End; // 机器人末端位姿
 
+// 设置机器人旋转关节J1,J2,J3连杆长度
+void Set_Roatation_Length(Robot_Rotation_Length* robot_rotation_length,double l1,double l2,double l3){
+   robot_rotation_length->l1=l1;
+   robot_rotation_length->l2=l2;
+   robot_rotation_length->l3=l3;
+}
+
 // 逆运动学，根据末端位姿求关节位移量
 void ikine(Pose_End* pose_end, Robot_Model *robot_model, Robot_Rotation_Length* length){
    robot_model->q1=pose_end->d_lateral;
