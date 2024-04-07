@@ -5,7 +5,7 @@ int main()
 {
     //Seq_lib* lib_test = fun_lib_gen();
     //xin_menu();
-    printf("%d\n",1);
+    //printf("%d\n",1);
     //scanf("%d",&t);
 
 
