@@ -1,5 +1,13 @@
+#ifndef ROBOT_MODEL
+#define ROBOT_MODEL
 #include <stdio.h>
 #include <math.h>
+
+typedef struct {
+   double l1; // J3长度，mm
+   double l2; // J4长度, mm
+   double l3; // J5长度, mm
+} Robot_Rotation_Length; // 机器人旋转关节J3,J4,J5尺寸
 
 typedef struct {
    double q1; //水平方向滑轨J1移动量，单位：mm （与基座相连）
@@ -9,13 +17,6 @@ typedef struct {
    double q5; //关节J5旋转量，单位：°（与J4相连，安装加持工具）
 } Robot_Model; //关节位移量
 
-typedef struct 
-{
-   double l1; // J3长度，mm
-   double l2; // J4长度, mm
-   double l3; // J5长度, mm
-} Robot_Rotation_Length; // 机器人旋转关节J3,J4,J5尺寸
-
 typedef struct {
    double d_lateral; // 横向滑轨位移量，mm
    double px; // x方向相对横向滑轨偏移，mm
@@ -24,23 +25,53 @@ typedef struct {
    double theta; // 末端旋转角度，°
 } Pose_End; // 机器人末端位姿
 
-// 设置机器人旋转关节J1,J2,J3连杆长度
-void Set_Roatation_Length(Robot_Rotation_Length* robot_rotation_length,double l1,double l2,double l3){
+// 设置机器人旋转关节J3,J4,J5连杆长度
+void Set_Rotation_Length(Robot_Rotation_Length* robot_rotation_length,double l1,double l2,double l3){
    robot_rotation_length->l1=l1;
    robot_rotation_length->l2=l2;
    robot_rotation_length->l3=l3;
 }
 
-// 逆运动学，根据末端位姿求关节位移量
-void ikine(Pose_End* pose_end, Robot_Model *robot_model, Robot_Rotation_Length* length){
-   robot_model->q1=pose_end->d_lateral;
-   robot_model->q2=pose_end->pz;
-   // 此处末端可视为二连杆机器人，逆运动学求解只考虑第二关节角度大于0的情况
-   double q0=atan2(pose_end->py-length->l1,pose_end->px);
-   double a0=sqrt((pose_end->py-length->l1)*(pose_end->py - length->l1) + (pose_end->px)*(pose_end->px));
-   double temp=(a0*a0+(length->l2)*(length->l2)-(length->l3)*(length->l3))/(2*a0*length->l2);
-   robot_model->q3=-acos(temp)+q0;
-   temp=(a0*a0-(length->l2)*(length->l2)+(length->l3)*(length->l3))/(2*a0*length->l3);
-   robot_model->q4=acos(temp)+q0-robot_model->q3;
-   robot_model->q5 = pose_end->theta - robot_model->q3 - robot_model->q4;
+// 设置机器人关节位移量q1--q5
+void Set_Robot_Model(Robot_Model *robot_model,double q1,double q2,double q3,double q4,double q5){
+   robot_model->q1=q1;
+   robot_model->q2=q2;
+   robot_model->q3=q3;
+   robot_model->q4=q4;
+   robot_model->q5=q5;
 }
+
+// 查看机器人旋转关节J3,J4,J5连杆长度
+void Show_Rotation_Length(Robot_Rotation_Length* robot_rotation_length){
+   printf("机器人旋转关节杆长为：\n");
+   printf("l1 = %f, l2 = %f , l3 = %f \n",robot_rotation_length->l1,robot_rotation_length->l2,robot_rotation_length->l3);
+}
+
+// 查看机器人关节位移量q1--q5
+void Show_Robot_Model(Robot_Model *robot_model){
+   printf("机器人关节位移量为：\n");
+   printf("q1 = %f\n",robot_model->q1);
+   printf("q2 = %f\n",robot_model->q2);
+   printf("q3 = %f\n",robot_model->q3);
+   printf("q4 = %f\n",robot_model->q4);
+   printf("q5 = %f\n",robot_model->q5);
+}
+
+// 查看机器人末端位姿
+void Show_Pose_End(Pose_End *pose_end){
+   printf("机器人末端位姿为：\n");
+   printf("d_lateral = %f\n",pose_end->d_lateral);
+   printf("px = %f\n",pose_end->px);
+   printf("py = %f\n",pose_end->py);
+   printf("py = %f\n",pose_end->pz);
+   printf("theta = %f\n",pose_end->theta);
+}
+
+// 调整角度，角度取值区间(-180°, 180°]
+double Angle_Adjustment(double angle){
+   if (angle > 180.0) angle-=360.0;
+   else if (angle < -180.0 || angle == 180.0) angle+=360.0;   
+   return angle;
+}
+
+#endif
